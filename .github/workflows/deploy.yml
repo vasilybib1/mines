@@ -21,7 +21,7 @@ jobs:
       - name: verify frontend
         run: |
           for i in $(seq 1 30); do
-            curl -sf http://localhost:8081 > /dev/null && exit 0
+            curl -sf http://localhost:8080 > /dev/null && exit 0
             sleep 1
           done
           echo "frontend didnt start"
