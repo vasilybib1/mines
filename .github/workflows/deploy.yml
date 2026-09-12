@@ -12,9 +12,28 @@ jobs:
       - name: checkout repo code
         uses: actions/checkout@v4
 
-      - name: build and run app
+      - name: build and start container
         run: | 
-          echo "deploying"
-          python3 -m venv venv
-          source venv/bin/activate
-          python -m http.server 80
+          docker compose build
+          docker compose up -d
+          docker image prune -f 
+
+      - name: verify frontend
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8081 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "frontend didnt start"
+          docker compose logs --tail=50
+          exit 1
+
+      - name: verify backend
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "backend didnt start"
+          docker compose logs --tail=50
+          exit 1
